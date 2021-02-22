@@ -1,6 +1,7 @@
-const { ApolloServer, gql } = require("apollo-server")
+const { ApolloServer, gql, UserInputError} = require("apollo-server")
 const mongoose = require("mongoose")
 require('dotenv').config()
+const jwt = require('jsonwebtoken')
 
 const Shopping_list = require("./models/shopping_list")
 const Item = require("./models/item")
@@ -18,6 +19,9 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
   .catch((error) => {
     console.log('error connection to MongoDB:', error.message)
   })
+
+const JWT_SECRET = 'SUPER_SEKRET'
+
 
 const typeDefs = gql`
   type Shopping_list {
@@ -41,20 +45,31 @@ const typeDefs = gql`
     id:ID!
   }
 
+  type Token {
+    value: String!
+  }
+
   type Query {
     listCount: Int!
     itemCount: Int!
+    userCount: Int!
     allItems: [Item!]!
     allLists: [Shopping_list]
     findList(listName:String!): Shopping_list
     allUsers: [User]
     findUser(username:String!): User
+    me: User
   }
 
   type Mutation {
     addNewUser(
       username: String!
     ):User
+
+    login(
+      username: String!
+      password: String!
+    ):Token
 
     addNewList(
       username: String!
@@ -100,11 +115,13 @@ const resolvers = {
   Query: {
     listCount: () => Shopping_list.collection.countDocuments(),
     itemCount: () => Item.collection.countDocuments(),
+    userCount:() => User.collection.countDocuments(),
     allItems: () => Item.find({}),
     allLists: async(root, args) => Shopping_list.find({}).populate("items"),
     findList: (root, args) => Shopping_list.findOne({listName: args.listName}).populate("items"),
     allUsers: async(root, args) => User.find({}).populate("user_shopping_lists"),
-    findUser: (root, args) => User.findOne({username: args.username}).populate("user_shopping_lists")
+    findUser: (root, args) => User.findOne({username: args.username}).populate("user_shopping_lists"),
+    me: (root, args, context) => { return context.currentUser }
   },
 //  User: {
   //  shopping_list: async(root)=> {
@@ -148,6 +165,21 @@ const resolvers = {
     addNewUser: (root, args) => {
       const user = new User({...args})
       return user.save()
+    },
+
+    login:(root, args) => {
+      const user = User.findOne({username: args.username})
+
+      if ( !user || args.password !== "Salasana" ) {
+        throw new UserInputError("Wrong credentials")
+      }
+
+      const userForToken = {
+        username: user.username,
+        id: user._id
+      }
+
+      return { value: jwt.sign(userForToken, JWT_SECRET)}
     },
 
     addNewList: async(root, args) => {
@@ -277,6 +309,16 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: async({ req }) => {
+    const auth = req ? req.headers.authorization : null
+    if (auth && auth.toLowerCase().startsWith("bearer ")) {
+      const decodedToken = jwt.verify(
+        auth.substring(7), JWT_SECRET
+      )
+      const currentUser = await User.findById(decodedToken.id)
+      return {currentUser}
+    }
+  }
 })
 
 server.listen().then(({url}) => {
