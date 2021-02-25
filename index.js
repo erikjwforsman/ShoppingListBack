@@ -57,7 +57,7 @@ const typeDefs = gql`
     allLists: [Shopping_list]
     findList(listName:String!): Shopping_list
     allUsers: [User]
-    findUser(username:String!): User
+    findUser(username:String): User
     me: User
   }
 
@@ -120,7 +120,12 @@ const resolvers = {
     allLists: async(root, args) => Shopping_list.find({}).populate("items"),
     findList: (root, args) => Shopping_list.findOne({listName: args.listName}).populate("items"),
     allUsers: async(root, args) => User.find({}).populate("user_shopping_lists"),
-    findUser: (root, args) => User.findOne({username: args.username}).populate("user_shopping_lists"),
+    findUser: (root, args) => {
+      if (!args.username){
+        return null
+      }
+      return User.findOne({username: args.username}).populate("user_shopping_lists")
+    },
     me: (root, args, context) => { return context.currentUser }
   },
 //  User: {
