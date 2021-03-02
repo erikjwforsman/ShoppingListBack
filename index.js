@@ -188,19 +188,15 @@ const resolvers = {
     },
 
     addNewList: async(root, args) => {
+      //Käyttäjän voisi siirtää myös suoraan propseista
       const user = await User.findOne({username:args.username})
 
       if(!user){
-        console.log("Failllll")
         return null
       }
-      console.log(user)
 
       const shopping_list = new Shopping_list({...args, listMembers: {...user}})
-      console.log("#################")
       user.user_shopping_lists.push(shopping_list)
-      console.log(user)
-      console.log("Ostoslista:",shopping_list)
       user.save()
       return shopping_list.save()
     },
@@ -209,7 +205,6 @@ const resolvers = {
       const shopping_list = await Shopping_list.findOne({listName: args.listName})
 
       if (!shopping_list){
-        console.log("Ei löydy")
         return null
       }
 
@@ -229,7 +224,6 @@ const resolvers = {
       }
 
       if (user.userContacts.includes(contact._id)){
-        console.log("Käyttäjä on jo lisätty kontakteihin")
         return null
       }
 
@@ -243,11 +237,9 @@ const resolvers = {
       const user = await User.findOne({username: args.nameToAdd})
       const shopping_list = await Shopping_list.findOne({listName: args.listName})
       if (!user || !shopping_list){
-        console.log("Käyttäjää tai listaa ei ole olemassa")
         return null
       }
       if (user.user_shopping_lists.includes(shopping_list._id)){
-        console.log("Käyttäjä on jo listalla")
         return null
       }
       user.user_shopping_lists.push(shopping_list)
@@ -261,7 +253,6 @@ const resolvers = {
       const item = await Item.findOne({itemName: args.itemName})
 
       if (!shopping_list || !item || !shopping_list.items.includes(item._id)){
-        console.log("Ongelma!!!")
         return null
       }
       const filtered = shopping_list.items.filter(obj => String(obj) !==item.id)
@@ -290,9 +281,6 @@ const resolvers = {
 
       const users = shopping_list.listMembers
       const itemsToBeRemoved = shopping_list.items
-
-      console.log(shopping_list)
-      console.log("(###############)")
 
       for (const user of users){
         const u = await User.findOne({_id:mongoose.Types.ObjectId(user)})
