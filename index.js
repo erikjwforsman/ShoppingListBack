@@ -89,13 +89,13 @@ const typeDefs = gql`
     ):User
 
     addUserToList(
-      listName: String!
+      listId: String!
       nameToAdd: String!
     ):Shopping_list
 
     removeItemFromList(
-      listName: String!
-      itemName: String!
+      listId: String!
+      itemId: String!
     ):Item
 
     editItemOnList(
@@ -235,7 +235,8 @@ const resolvers = {
 
     addUserToList: async(root, args) => {
       const user = await User.findOne({username: args.nameToAdd})
-      const shopping_list = await Shopping_list.findOne({listName: args.listName})
+      const shopping_list = await Shopping_list.findOne({_id: args.listId})
+
       if (!user || !shopping_list){
         return null
       }
@@ -244,19 +245,22 @@ const resolvers = {
       }
       user.user_shopping_lists.push(shopping_list)
       shopping_list.listMembers.push(user)
+
       user.save()
       return shopping_list.save()
     },
 
     removeItemFromList:async(root, args) =>{
-      const shopping_list = await Shopping_list.findOne({listName: args.listName})
-      const item = await Item.findOne({itemName: args.itemName})
+      //console.log(args)
+      const shopping_list = await Shopping_list.findOne({_id: args.listId})
+      const item = await Item.findOne({_id: args.itemId})
 
       if (!shopping_list || !item || !shopping_list.items.includes(item._id)){
         return null
       }
       const filtered = shopping_list.items.filter(obj => String(obj) !==item.id)
       shopping_list.items= filtered
+
       await Item.deleteOne({_id:item.id})
       return shopping_list.save()
     },
