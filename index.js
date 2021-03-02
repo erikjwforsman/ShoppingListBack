@@ -20,8 +20,8 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
     console.log('error connection to MongoDB:', error.message)
   })
 
-const JWT_SECRET = 'SUPER_SEKRET'
-
+//const JWT_SECRET = 'SUPER_SEKRET' Ei enää käytössä
+const JWT_SECRET = process.env.JWT_KEY
 
 const typeDefs = gql`
   type Shopping_list {
