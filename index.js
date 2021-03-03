@@ -99,13 +99,14 @@ const typeDefs = gql`
     ):Item
 
     editItemOnList(
+      itemId: String!
       itemName: String!
       itemAmount: String
       itemNote: String
     ):Item
 
     deleteList(
-      listName: String!
+      listId: String!
     ):Shopping_list
 
   }
@@ -267,17 +268,21 @@ const resolvers = {
 
     editItemOnList:async(root, args) => {
       //Ei tarvita ostoslistaa, koska jatkossa tunnistaminen tapahtuu ID:lla
-      const item = await Item.findOne({itemName: args.itemName})
+      const item = await Item.findOne({_id: args.itemId})
       if (!item){
         return null
       }
-      const replacer = {itemNamename: args.itemName, itemAmount: args.itemAmount, itemNote: args.itemNote}
-      Item.findByIdAndUpdate(item.id, {itemNamename: args.itemName, itemAmount: args.itemAmount, itemNote: args.itemNote},function(error){ console.log(error) })
+
+      //console.log(item)
+    //  return null
+      const replacer = {itemName: args.itemName, itemAmount: args.itemAmount, itemNote: args.itemNote}
+      console.log(replacer)
+      Item.findByIdAndUpdate(item.id, {itemName: args.itemName, itemAmount: args.itemAmount, itemNote: args.itemNote},function(error){ console.log(error) })
       return null
     },
 
     deleteList:async(root, args) => {
-      const shopping_list = await Shopping_list.findOne({listName: args.listName})
+      const shopping_list = await Shopping_list.findOne({_id: args.listId})
 
       if (!shopping_list){
         return null
