@@ -77,7 +77,7 @@ const typeDefs = gql`
     ):Shopping_list
 
     addItemToList(
-      listName: String!
+      listId: String!
       itemName: String!
       itemAmount: String
       itemNote: String
@@ -203,7 +203,7 @@ const resolvers = {
     },
 
     addItemToList: async(root, args) => {
-      const shopping_list = await Shopping_list.findOne({listName: args.listName})
+      const shopping_list = await Shopping_list.findOne({_id: args.listId})
 
       if (!shopping_list){
         return null
