@@ -8,7 +8,7 @@ const Item = require("./models/item")
 const User = require("./models/user")
 
 const url = process.env.MONGODB_URI
-
+//Pitää tehdä uusi .env tiedosto
 
 console.log('connecting to Mongo')
 
@@ -20,7 +20,8 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
     console.log('error connection to MongoDB:', error.message)
   })
 
-//const JWT_SECRET = 'SUPER_SEKRET' Ei enää käytössä
+
+//const JWT_SECRET = 'SUPER_SECRET' Ei enää käytössä
 const JWT_SECRET = process.env.JWT_KEY
 
 const typeDefs = gql`
@@ -55,7 +56,7 @@ const typeDefs = gql`
     userCount: Int!
     allItems: [Item!]!
     allLists: [Shopping_list]
-    findList(listName:String!): Shopping_list
+    findList(listId:String!): Shopping_list
     allUsers: [User]
     findUser(username:String): User
     me: User
@@ -93,6 +94,11 @@ const typeDefs = gql`
       nameToAdd: String!
     ):Shopping_list
 
+    removeUserFromList(
+      listId: String!
+      username: String!
+    ):Shopping_list
+
     removeItemFromList(
       listId: String!
       itemId: String!
@@ -119,7 +125,7 @@ const resolvers = {
     userCount:() => User.collection.countDocuments(),
     allItems: () => Item.find({}),
     allLists: async(root, args) => Shopping_list.find({}).populate("items"),
-    findList: (root, args) => Shopping_list.findOne({listName: args.listName}).populate("items"),
+    findList: (root, args) => Shopping_list.findOne({_id: args.listId}).populate("items"),
     allUsers: async(root, args) => User.find({}).populate("user_shopping_lists"),
     findUser: (root, args) => {
       if (!args.username){
@@ -249,6 +255,36 @@ const resolvers = {
 
       user.save()
       return shopping_list.save()
+    },
+
+    removeUserFromList:async(root, args) =>{
+      console.log("ALKAA")
+      const user = await User.findOne({username: args.username})
+      const shopping_list = await Shopping_list.findOne({_id: args.listId})
+
+      if (!user || !shopping_list){
+        return null
+      }
+      if (!user.user_shopping_lists.includes(shopping_list._id)){
+        console.log("EI LISTALLA")
+        return null
+      }
+
+      console.log("ALKU",shopping_list)
+      console.log("ALKU",user)
+
+      //listan päivitys tallennusta vaille valmis
+      shopping_list.listMembers = shopping_list.listMembers.filter(single => String(single) !== String(user._id))
+      console.log("VIRALLINEN:",shopping_list)
+
+      user.user_shopping_lists = user.user_shopping_lists.filter(single => String(single) !== String(args.listId))
+      console.log("LOPPU:",user)
+      shopping_list.save()
+      user.save()
+      return null
+
+      //shopping_list = shopping_list.filter(listMembers => listMembers.)
+
     },
 
     removeItemFromList:async(root, args) =>{
