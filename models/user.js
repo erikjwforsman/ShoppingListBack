@@ -8,7 +8,11 @@ const schema = new mongoose.Schema({
     required: true,
     minlength: 1
   },
-
+  passwordHash: {
+    type:String,
+    required: true,
+    minlength: 1
+  },
   user_shopping_lists: [{
     type:mongoose.Schema.Types.ObjectId,
     ref:"Shopping_list"

@@ -2,6 +2,7 @@ const { ApolloServer, gql, UserInputError} = require("apollo-server")
 const mongoose = require("mongoose")
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 const Shopping_list = require("./models/shopping_list")
 const Item = require("./models/item")
@@ -19,7 +20,6 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
   .catch((error) => {
     console.log('error connection to MongoDB:', error.message)
   })
-
 
 //const JWT_SECRET = 'SUPER_SECRET' Ei enää käytössä
 const JWT_SECRET = process.env.JWT_KEY
@@ -65,6 +65,7 @@ const typeDefs = gql`
   type Mutation {
     addNewUser(
       username: String!
+      password: String!
     ):User
 
     login(
@@ -172,19 +173,32 @@ const resolvers = {
       return retUsers
     }
   },
-
+  //  //  //  //  //  //  //  // remontti alkaa...
   Mutation: {
-    addNewUser: (root, args) => {
-      const user = new User({...args})
+    addNewUser: async(root, args) => {
+      const saltRounds = 10
+      const passwordHash = await bcrypt.hash(args.password, saltRounds)
+      const user = new User({
+        username: args.username,
+        passwordHash
+      })
+      console.log(user)
       return user.save()
     },
 
-    login:(root, args) => {
-      const user = User.findOne({username: args.username})
+    login: async (root, args) => {
+      const user = await User.findOne({username: args.username})
 
-      if ( !user || args.password !== "Salasana" ) {
+      const passwordCorrect = user === null ? false : await bcrypt.compare(args.password, user.passwordHash)
+
+      if ( !(user && passwordCorrect) ) {
         throw new UserInputError("Wrong credentials")
       }
+
+      //// vanha tästä alaspäin
+      // if ( !user || args.password !== "Salasana" ) {
+      //   throw new UserInputError("Wrong credentials")
+      // }
 
       const userForToken = {
         username: user.username,
