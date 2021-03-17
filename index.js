@@ -21,7 +21,8 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
     console.log('error connection to MongoDB:', error.message)
   })
 
-const JWT_SECRET = process.env.JWT_KEY
+const JWT_SECRET = 'SUPER_SEKRET' //Ei enää käytössä
+//const JWT_SECRET = process.env.JWT_KEY
 
 const typeDefs = gql`
   type Shopping_list {
@@ -391,7 +392,10 @@ const server = new ApolloServer({
     }
   }
 })
+/// /// /// /// /// Heroku alkaa
 
-server.listen().then(({url}) => {
+const PORT = process.env.PORT || 4000
+
+server.listen(PORT).then(({url}) => {
   console.log(`Server ready at ${url}`)
 })
