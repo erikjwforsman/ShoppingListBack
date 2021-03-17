@@ -21,7 +21,6 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
     console.log('error connection to MongoDB:', error.message)
   })
 
-//const JWT_SECRET = 'SUPER_SECRET' Ei enää käytössä
 const JWT_SECRET = process.env.JWT_KEY
 
 const typeDefs = gql`
@@ -105,6 +104,11 @@ const typeDefs = gql`
       itemId: String!
     ):Item
 
+    removeManyItems(
+      listId: String!,
+      itemIds: [String!]
+    ):Shopping_list
+
     editItemOnList(
       itemId: String!
       itemName: String!
@@ -173,7 +177,7 @@ const resolvers = {
       return retUsers
     }
   },
-  //  //  //  //  //  //  //  // remontti alkaa...
+
   Mutation: {
     addNewUser: async(root, args) => {
       const saltRounds = 10
@@ -313,6 +317,21 @@ const resolvers = {
       shopping_list.items= filtered
 
       await Item.deleteOne({_id:item.id})
+      return shopping_list.save()
+    },
+
+    removeManyItems:async(root, args) => {
+      const shopping_list = await Shopping_list.findOne({_id: args.listId})
+      const itemsToBeRemoved = args.itemIds
+
+      for (const item of itemsToBeRemoved){
+        // tuotten poistokoodi
+        await Item.deleteOne({_id: item})
+
+        //listan siistimiskoodi
+        const filtered = shopping_list.items.filter(obj => String(obj) !==item)
+        shopping_list.items= filtered
+      }
       return shopping_list.save()
     },
 
