@@ -1,3 +1,4 @@
+// const express = require('express')
 const { ApolloServer, gql, UserInputError} = require("apollo-server")
 const mongoose = require("mongoose")
 require('dotenv').config()
@@ -393,9 +394,13 @@ const server = new ApolloServer({
   }
 })
 /// /// /// /// /// Heroku alkaa
+// const app = express()
+// server.applyMiddleware({app})
 
 const PORT = process.env.PORT || 4000
 
-server.listen(PORT).then(({url}) => {
-  console.log(`Server ready at ${url}`)
-})
+   server.listen(PORT).then(({url}) => {
+     console.log(`Server ready at ${url}`)
+ })
+  // app.listen(PORT, () =>
+  //   console.log(`🚀 Server ready at ${url}`))
