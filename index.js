@@ -1,5 +1,5 @@
-// const express = require('express')
-const { ApolloServer, gql, UserInputError} = require("apollo-server")
+const express = require('express')
+const { ApolloServer, gql, UserInputError} = require("apollo-server-express")
 const mongoose = require("mongoose")
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
@@ -11,7 +11,6 @@ const User = require("./models/user")
 
 const typeDefs = require("./vali/typeDefs")
 const resolvers = require("./vali/resolvers")
-
 const url = process.env.MONGODB_URI
 
 console.log('connecting to Mongo')
@@ -24,8 +23,7 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
     console.log('error connection to MongoDB:', error.message)
   })
 
-const JWT_SECRET = process.env.JWT_SECRET //Ei enää käytössä
-//const JWT_SECRET = process.env.JWT_SECRET
+const JWT_SECRET = process.env.JWT_SECRET
 
 const server = new ApolloServer({
   typeDefs,
@@ -41,14 +39,13 @@ const server = new ApolloServer({
     }
   }
 })
-/// /// /// /// /// Heroku alkaa
-// const app = express()
-// server.applyMiddleware({app})
+const app = express()
+server.applyMiddleware({app})
 
 const PORT = process.env.PORT || 4000
 
-   server.listen(PORT).then(({url}) => {
-     console.log(`Server ready at ${url}`)
- })
-  // app.listen(PORT, () =>
-  //   console.log(`🚀 Server ready at ${url}`))
+// server.listen(PORT).then(({url}) => {
+//   console.log(`Server ready at ${url}`)
+// })
+  app.listen(PORT, () =>
+    console.log(`🚀 Server ready`))
