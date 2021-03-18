@@ -1,8 +1,14 @@
 const {gql} = require("apollo-server")
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
+const mongoose = require("mongoose")
 
 const Shopping_list = require("../models/shopping_list")
 const Item = require("../models/item")
 const User = require("../models/user")
+
+const JWT_SECRET = process.env.JWT_SECRET
 
 const resolvers = {
   Query: {

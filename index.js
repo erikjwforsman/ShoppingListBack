@@ -13,7 +13,6 @@ const typeDefs = require("./vali/typeDefs")
 const resolvers = require("./vali/resolvers")
 
 const url = process.env.MONGODB_URI
-//Pitää tehdä uusi .env tiedosto
 
 console.log('connecting to Mongo')
 
@@ -25,8 +24,8 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
     console.log('error connection to MongoDB:', error.message)
   })
 
-const JWT_SECRET = 'SUPER_SEKRET' //Ei enää käytössä
-//const JWT_SECRET = process.env.JWT_KEY
+const JWT_SECRET = process.env.JWT_SECRET //Ei enää käytössä
+//const JWT_SECRET = process.env.JWT_SECRET
 
 const server = new ApolloServer({
   typeDefs,
