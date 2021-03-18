@@ -27,6 +27,14 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
 
 const JWT_SECRET = process.env.JWT_SECRET
 
+const app = express()
+
+app.use(express.static('build'));
+
+app.get("/", (req, res) =>{
+  res.sendFile(path.resolve(__dirname, "build", "index.html"))
+})
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
@@ -41,7 +49,7 @@ const server = new ApolloServer({
     }
   }
 })
-const app = express()
+
 app.use(cors())
 server.applyMiddleware({ app, path:"/" })
 
