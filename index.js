@@ -4,6 +4,8 @@ const mongoose = require("mongoose")
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const cors = require('cors')
+
 
 const Shopping_list = require("./models/shopping_list")
 const Item = require("./models/item")
@@ -40,7 +42,8 @@ const server = new ApolloServer({
   }
 })
 const app = express()
-server.applyMiddleware({app})
+app.use(cors())
+server.applyMiddleware({ app, path:"/" })
 
 const PORT = process.env.PORT || 4000
 
