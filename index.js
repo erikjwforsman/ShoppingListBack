@@ -31,7 +31,7 @@ const app = express()
 
 app.use(express.static('build'));
 
-app.get("/", (req, res) =>{
+app.get("/u/", (req, res) =>{
   res.sendFile(path.resolve(__dirname, "build", "index.html"))
 })
 
@@ -51,7 +51,7 @@ const server = new ApolloServer({
 })
 
 app.use(cors())
-server.applyMiddleware({ app, path:"/graphql" })
+server.applyMiddleware({ app, path:"/" })
 
 const PORT = process.env.PORT || 4000
 
