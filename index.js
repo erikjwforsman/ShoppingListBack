@@ -29,11 +29,11 @@ const JWT_SECRET = process.env.JWT_SECRET
 
 const app = express()
 
-app.use(express.static('build'));
+// app.use(express.static('build'));
 
-app.get("/u/", (req, res) =>{
-  res.sendFile(path.resolve(__dirname, "build", "index.html"))
-})
+// app.get("/u/", (req, res) =>{
+//   res.sendFile(path.resolve(__dirname, "build", "index.html"))
+// })
 
 const server = new ApolloServer({
   typeDefs,
@@ -51,7 +51,7 @@ const server = new ApolloServer({
 })
 
 app.use(cors())
-server.applyMiddleware({ app, path:"/" })
+server.applyMiddleware({ app, path:"/graphql" })
 
 const PORT = process.env.PORT || 4000
 
