@@ -55,10 +55,10 @@ server.applyMiddleware({ app, path:"/" })
 
 const PORT = process.env.PORT || 4000
 
-// server.listen(PORT).then(({url}) => {
-//   console.log(`Server ready at ${url}`)
-// })
+ app.listen(PORT).then(({url}) => {
+   console.log(`Server ready at ${url}`)
+ })
 //HUOMHUOMHUOM
 //Osoitteen perään => /graphql
-  app.listen(PORT, () =>
-    console.log(`🚀 Server ready`))
+  // app.listen(PORT, () =>
+  //   console.log(`🚀 Server ready`))
