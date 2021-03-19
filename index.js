@@ -55,7 +55,7 @@ const server = new ApolloServer({
 app.use(express.static('build'));
 
 //=>"*" //Siirretty ylhäältä
-app.get("/", (req, res) =>{
+app.get("*", (req, res) =>{
   res.sendFile(path.resolve(__dirname, "build", "index.html"))
 })
 
