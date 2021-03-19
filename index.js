@@ -5,7 +5,7 @@ require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const cors = require('cors')
-
+const path = require("path") //
 
 const Shopping_list = require("./models/shopping_list")
 const Item = require("./models/item")
@@ -29,11 +29,13 @@ const JWT_SECRET = process.env.JWT_SECRET
 
 const app = express()
 
-app.use(express.static('build'));
-
-app.get("/", (req, res) =>{
-  res.sendFile(path.resolve(__dirname, "build", "index.html"))
-})
+//siirtyy alas
+// app.use(express.static('build'));
+//
+// //=>"*"
+// app.get("/", (req, res) =>{
+//   res.sendFile(path.resolve(__dirname, "build", "index.html"))
+// })
 
 const server = new ApolloServer({
   typeDefs,
@@ -48,6 +50,13 @@ const server = new ApolloServer({
       return {currentUser}
     }
   }
+})
+
+app.use(express.static('build'));
+
+//=>"*" //Siirretty ylhäältä
+app.get("/", (req, res) =>{
+  res.sendFile(path.resolve(__dirname, "build", "index.html"))
 })
 
 app.use(cors())
