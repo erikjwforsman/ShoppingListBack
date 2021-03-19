@@ -53,9 +53,8 @@ const server = new ApolloServer({
 app.use(cors())
 server.applyMiddleware({ app, path:"/" })
 
-//const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 4000
 
-const PORT = "https://quiet-plains-93370.herokuapp.com/"
 // server.listen(PORT).then(({url}) => {
 //   console.log(`Server ready at ${url}`)
 // })
