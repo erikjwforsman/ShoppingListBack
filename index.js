@@ -51,7 +51,7 @@ const server = new ApolloServer({
     }
   }
 })
-
+////// Returni
 app.use(express.static('build'));
 
 //=>"*" //Siirretty ylhäältä
